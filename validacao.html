@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dados do Aluno - UNIP</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding: 30px 16px;
+      color: #1a1a1a;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .header {
+      background: #1e3a8a;
+      color: white;
+      padding: 16px 20px;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .content {
+      padding: 24px 20px;
+    }
+
+    .linha {
+      display: flex;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    .label {
+      width: 130px;
+      font-weight: 700;
+      color: #1e3a8a;
+      flex-shrink: 0;
+    }
+
+    .valor {
+      color: #1e3a8a;
+      font-weight: 500;
+    }
+
+    .status {
+      margin-top: 24px;
+      padding: 14px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      border-radius: 8px;
+      text-align: center;
+      color: #166534;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .validade {
+      margin-top: 12px;
+      padding: 12px;
+      background: #1e3a8a;
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .aviso {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .contador {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">Dados do Aluno</div>
+
+    <div class="content">
+      <div class="linha">
+        <div class="label">Matrícula:</div>
+        <div class="valor" id="matricula">1821290</div>
+      </div>
+      <div class="linha">
+        <div class="label">Nome:</div>
+        <div class="valor" id="nome">ERIC SILVA DE OLIVEIRA</div>
+      </div>
+      <div class="linha">
+        <div class="label">Nascimento:</div>
+        <div class="valor" id="nascimento">20/02/1996</div>
+      </div>
+      <div class="linha">
+        <div class="label">Curso:</div>
+        <div class="valor" id="curso">59101 - ADMINISTRAÇÃO</div>
+      </div>
+      <div class="linha">
+        <div class="label">Unidade:</div>
+        <div class="valor" id="unidade">9094 - SÃO BERNARDO DO CAMPO</div>
+      </div>
+
+      <div class="status">
+        ✓ Carteirinha VÁLIDA
+      </div>
+
+      <div class="validade">
+        Validade: <span id="validadeTexto">DEZ/2026</span>
+      </div>
+
+      <div class="aviso">
+        Documento de identificação estudantil<br>
+        Esta página fecha automaticamente em <span id="tempo">60</span> segundos
+      </div>
+
+      <div class="contador" id="contador"></div>
+    </div>
+  </div>
+
+  <script>
+    // Dados (sem RG / CPF)
+    const pessoas = {
+      eric: {
+        matricula: "1821290",
+        nome: "ERIC SILVA DE OLIVEIRA",
+        nascimento: "20/02/1996",
+        curso: "59101 - ADMINISTRAÇÃO",
+        unidade: "9094 - SÃO BERNARDO DO CAMPO"
+      },
+      lucimara: {
+        matricula: "1821292",
+        nome: "LUCIMARA DE ARAÚJO SILVA",
+        nascimento: "04/07/1994",
+        curso: "CONTABILIDADE",
+        unidade: "9094 - SÃO BERNARDO DO CAMPO"
+      }
+    };
+
+    function getValidade() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      return month <= 6 ? `JUN/${year}` : `DEZ/${year}`;
+    }
+
+    function carregar(pessoa) {
+      const p = pessoas[pessoa];
+      document.getElementById("matricula").textContent = p.matricula;
+      document.getElementById("nome").textContent = p.nome;
+      document.getElementById("nascimento").textContent = p.nascimento;
+      document.getElementById("curso").textContent = p.curso;
+      document.getElementById("unidade").textContent = p.unidade;
+      document.getElementById("validadeTexto").textContent = getValidade();
+    }
+
+    // Detecta quem é pela URL (?pessoa=lucimara)
+    const params = new URLSearchParams(window.location.search);
+    const pessoa = params.get("pessoa") === "lucimara" ? "lucimara" : "eric";
+    carregar(pessoa);
+
+    // Contador + fecha a aba em 60 segundos
+    let segundos = 60;
+    const tempoEl = document.getElementById("tempo");
+
+    const intervalo = setInterval(() => {
+      segundos--;
+      tempoEl.textContent = segundos;
+
+      if (segundos <= 0) {
+        clearInterval(intervalo);
+        // Tenta fechar a aba
+        window.close();
+        // Se não conseguir fechar (alguns navegadores bloqueiam), redireciona
+        document.body.innerHTML = "<div style='padding:40px;text-align:center;font-family:Arial;'>Validação encerrada.</div>";
+      }
+    }, 1000);
+
+    // Tenta limpar um pouco o histórico (limitado)
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  </script>
+</body>
+</html>
