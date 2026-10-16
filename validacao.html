@@ -26,7 +26,6 @@
       overflow: hidden;
     }
 
-    /* Logo / atalho UNIP no topo */
     .topo-unip {
       background: #fff;
       padding: 18px 16px 12px;
@@ -174,7 +173,6 @@
 <body>
 
   <div class="container" id="container">
-    <!-- Atalho / logo UNIP no topo -->
     <div class="topo-unip">
       <a href="https://www.unip.br" target="_blank" rel="noopener">
         <div class="logo-unip">UNIP</div>
@@ -255,20 +253,33 @@
     if (!matricula || !nome || !nascimento || !curso) {
       window.location.replace("https://www.unip.br");
     } else {
-      document.getElementById("matricula").textContent = matricula;
-      document.getElementById("nome").textContent = nome;
-      document.getElementById("nascimento").textContent = nascimento;
-      document.getElementById("curso").textContent = curso;
-      document.getElementById("unidade").textContent = unidade || "—";
-      document.getElementById("validadeTexto").textContent = getValidade();
+      // Marca que esta visualização já foi usada (nesta sessão do navegador)
+      const chave = "val_" + matricula + "_" + nome;
+      if (sessionStorage.getItem(chave) === "1") {
+        // Já viu antes nesta sessão → não mostra de novo
+        window.location.replace("https://www.unip.br");
+      } else {
+        sessionStorage.setItem(chave, "1");
 
-      // Tenta tela cheia automática
-      tentarTelaCheia();
-      setTimeout(tentarTelaCheia, 300);
+        document.getElementById("matricula").textContent = matricula;
+        document.getElementById("nome").textContent = nome;
+        document.getElementById("nascimento").textContent = nascimento;
+        document.getElementById("curso").textContent = curso;
+        document.getElementById("unidade").textContent = unidade || "—";
+        document.getElementById("validadeTexto").textContent = getValidade();
 
-      // Limpa histórico
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, "", window.location.pathname);
+        tentarTelaCheia();
+        setTimeout(tentarTelaCheia, 300);
+
+        // Remove os dados da URL imediatamente (não fica no histórico)
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+
+        // Cronômetro ESCONDIDO de 15 segundos → redireciona
+        setTimeout(function() {
+          window.location.replace("https://www.unip.br");
+        }, 15000);
       }
     }
   </script>
