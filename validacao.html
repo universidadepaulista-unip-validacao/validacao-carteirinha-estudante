@@ -90,14 +90,12 @@
       line-height: 1.5;
     }
 
-    /* Botão Consulta concluída */
-    .btn-concluir {
+    /* Botões */
+    .btn-concluir, .btn-fullscreen {
       display: block;
       width: 100%;
-      margin-top: 20px;
+      margin-top: 12px;
       padding: 14px 16px;
-      background: #1e3a8a;
-      color: white;
       border: none;
       border-radius: 10px;
       font-size: 15px;
@@ -109,8 +107,23 @@
       transition: background 0.2s;
     }
 
+    .btn-concluir {
+      background: #1e3a8a;
+      color: white;
+      margin-top: 20px;
+    }
+
     .btn-concluir:active {
       background: #152a66;
+    }
+
+    .btn-fullscreen {
+      background: #0f766e;
+      color: white;
+    }
+
+    .btn-fullscreen:active {
+      background: #0d5c56;
     }
 
     /* Tela de conclusão após 1 minuto */
@@ -232,6 +245,11 @@
         Esta página fecha automaticamente em <span id="tempo">60</span> segundos
       </div>
 
+      <!-- Botão tela cheia -->
+      <button class="btn-fullscreen" id="btnFullscreen" onclick="entrarTelaCheia()">
+        ⛶ Abrir em tela cheia
+      </button>
+
       <!-- Botão disponível a qualquer momento -->
       <a href="https://www.unip.br" class="btn-concluir" id="btnConcluir">
         Consulta concluída →
@@ -258,6 +276,27 @@
       const year = now.getFullYear();
       const month = now.getMonth() + 1;
       return month <= 6 ? `JUN/${year}` : `DEZ/${year}`;
+    }
+
+    // Tela cheia (funciona em Android, iPhone e Desktop)
+    function entrarTelaCheia() {
+      const el = document.documentElement;
+      try {
+        if (el.requestFullscreen) {
+          el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) { // Safari / iOS
+          el.webkitRequestFullscreen();
+        } else if (el.msRequestFullscreen) {
+          el.msRequestFullscreen();
+        } else if (el.mozRequestFullScreen) {
+          el.mozRequestFullScreen();
+        }
+      } catch (e) {
+        // Alguns navegadores bloqueiam se não for gesto do usuário
+      }
+      // Esconde o botão depois de clicar
+      const btn = document.getElementById("btnFullscreen");
+      if (btn) btn.style.display = "none";
     }
 
     // Lê os dados APENAS da URL (nenhum dado pessoal fica no código)
