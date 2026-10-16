@@ -36,6 +36,7 @@
     .topo-unip a {
       text-decoration: none;
       display: inline-block;
+      cursor: pointer;
     }
 
     .topo-unip .logo-unip {
@@ -174,7 +175,7 @@
 
   <div class="container" id="container">
     <div class="topo-unip">
-      <a href="https://www.unip.br" target="_blank" rel="noopener">
+      <a href="#" onclick="sair(); return false;">
         <div class="logo-unip">UNIP</div>
         <div class="logo-sub">UNIVERSIDADE PAULISTA</div>
         <div class="atalho">www.unip.br</div>
@@ -217,7 +218,7 @@
         Documento de identificação estudantil
       </div>
 
-      <a href="https://www.unip.br" class="btn-concluir">
+      <a href="#" class="btn-concluir" onclick="sair(); return false;">
         Consulta concluída
       </a>
     </div>
@@ -229,6 +230,11 @@
       const year = now.getFullYear();
       const month = now.getMonth() + 1;
       return month <= 6 ? `JUN/${year}` : `DEZ/${year}`;
+    }
+
+    // Sempre usa replace → não fica no histórico, não dá para voltar
+    function sair() {
+      window.location.replace("https://www.unip.br");
     }
 
     function tentarTelaCheia() {
@@ -249,14 +255,13 @@
     const curso = params.get("c");
     const unidade = params.get("u");
 
-    // Sem parâmetros do QR → vai direto pro site oficial
+    // Sem parâmetros do QR → vai direto pro site oficial (sem voltar)
     if (!matricula || !nome || !nascimento || !curso) {
       window.location.replace("https://www.unip.br");
     } else {
-      // Marca que esta visualização já foi usada (nesta sessão do navegador)
+      // Marca visualização nesta sessão
       const chave = "val_" + matricula + "_" + nome;
       if (sessionStorage.getItem(chave) === "1") {
-        // Já viu antes nesta sessão → não mostra de novo
         window.location.replace("https://www.unip.br");
       } else {
         sessionStorage.setItem(chave, "1");
@@ -271,15 +276,13 @@
         tentarTelaCheia();
         setTimeout(tentarTelaCheia, 300);
 
-        // Remove os dados da URL imediatamente (não fica no histórico)
+        // Remove os dados da URL (não fica no histórico)
         if (window.history && window.history.replaceState) {
           window.history.replaceState(null, "", window.location.pathname);
         }
 
-        // Cronômetro ESCONDIDO de 15 segundos → redireciona
-        setTimeout(function() {
-          window.location.replace("https://www.unip.br");
-        }, 15000);
+        // 15 segundos escondidos → sai sem possibilidade de voltar
+        setTimeout(sair, 15000);
       }
     }
   </script>
