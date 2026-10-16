@@ -90,12 +90,13 @@
       line-height: 1.5;
     }
 
-    /* Botões */
-    .btn-concluir, .btn-fullscreen {
+    .btn-concluir {
       display: block;
       width: 100%;
-      margin-top: 12px;
+      margin-top: 20px;
       padding: 14px 16px;
+      background: #1e3a8a;
+      color: white;
       border: none;
       border-radius: 10px;
       font-size: 15px;
@@ -104,83 +105,12 @@
       text-align: center;
       text-decoration: none;
       -webkit-tap-highlight-color: transparent;
-      transition: background 0.2s;
-    }
-
-    .btn-concluir {
-      background: #1e3a8a;
-      color: white;
-      margin-top: 20px;
     }
 
     .btn-concluir:active {
       background: #152a66;
     }
 
-    .btn-fullscreen {
-      background: #0f766e;
-      color: white;
-    }
-
-    .btn-fullscreen:active {
-      background: #0d5c56;
-    }
-
-    /* Tela de conclusão após 1 minuto */
-    .conclusao {
-      display: none;
-      padding: 44px 24px;
-      text-align: center;
-    }
-
-    .conclusao.show {
-      display: block;
-    }
-
-    .conclusao .logo-unip {
-      font-size: 40px;
-      font-weight: 900;
-      color: #f5a623;
-      letter-spacing: -1px;
-      font-family: Arial Black, Arial, sans-serif;
-      margin-bottom: 2px;
-    }
-
-    .conclusao .logo-sub {
-      font-size: 10px;
-      color: #666;
-      letter-spacing: 1px;
-      font-weight: 600;
-      margin-bottom: 26px;
-    }
-
-    .conclusao .check {
-      font-size: 46px;
-      color: #16a34a;
-      margin-bottom: 14px;
-      line-height: 1;
-    }
-
-    .conclusao h2 {
-      font-size: 17px;
-      color: #1e3a8a;
-      margin-bottom: 8px;
-    }
-
-    .conclusao p {
-      font-size: 13.5px;
-      color: #666;
-      line-height: 1.5;
-      margin-bottom: 22px;
-    }
-
-    .conclusao .redirect {
-      font-size: 12.5px;
-      color: #888;
-      margin-bottom: 18px;
-    }
-
-    /* Desktop */
     @media (min-width: 600px) {
       body { padding: 40px 20px; }
       .container { max-width: 520px; border-radius: 10px; }
@@ -192,7 +122,6 @@
       .btn-concluir { font-size: 15.5px; padding: 15px; }
     }
 
-    /* iPhone / telas estreitas */
     @media (max-width: 380px) {
       body { padding: 12px 10px; }
       .label { width: 100px; font-size: 13.5px; }
@@ -200,8 +129,6 @@
       .header { font-size: 15px; padding: 12px 14px; }
       .content { padding: 16px 14px; }
       .btn-concluir { font-size: 14px; padding: 13px; }
-      .conclusao { padding: 36px 18px; }
-      .conclusao .logo-unip { font-size: 34px; }
     }
   </style>
 </head>
@@ -242,30 +169,11 @@
 
       <div class="aviso">
         Documento de identificação estudantil<br>
-        Esta página fecha automaticamente em <span id="tempo">60</span> segundos
+        Esta página fecha automaticamente em <span id="tempo">30</span> segundos
       </div>
 
-      <!-- Botão tela cheia -->
-      <button class="btn-fullscreen" id="btnFullscreen" onclick="entrarTelaCheia()">
-        ⛶ Abrir em tela cheia
-      </button>
-
-      <!-- Botão disponível a qualquer momento -->
-      <a href="https://www.unip.br" class="btn-concluir" id="btnConcluir">
-        Consulta concluída →
-      </a>
-    </div>
-
-    <!-- Tela final após 1 minuto -->
-    <div class="conclusao" id="conclusao">
-      <div class="logo-unip">UNIP</div>
-      <div class="logo-sub">UNIVERSIDADE PAULISTA</div>
-      <div class="check">✓</div>
-      <h2>Validação de identidade concluída</h2>
-      <p>A verificação da carteirinha estudantil foi realizada com sucesso.</p>
-      <div class="redirect">Redirecionando para o site oficial...</div>
       <a href="https://www.unip.br" class="btn-concluir">
-        Ir para o site da UNIP →
+        Consulta concluída →
       </a>
     </div>
   </div>
@@ -278,28 +186,16 @@
       return month <= 6 ? `JUN/${year}` : `DEZ/${year}`;
     }
 
-    // Tela cheia (funciona em Android, iPhone e Desktop)
-    function entrarTelaCheia() {
+    function tentarTelaCheia() {
       const el = document.documentElement;
       try {
-        if (el.requestFullscreen) {
-          el.requestFullscreen();
-        } else if (el.webkitRequestFullscreen) { // Safari / iOS
-          el.webkitRequestFullscreen();
-        } else if (el.msRequestFullscreen) {
-          el.msRequestFullscreen();
-        } else if (el.mozRequestFullScreen) {
-          el.mozRequestFullScreen();
-        }
-      } catch (e) {
-        // Alguns navegadores bloqueiam se não for gesto do usuário
-      }
-      // Esconde o botão depois de clicar
-      const btn = document.getElementById("btnFullscreen");
-      if (btn) btn.style.display = "none";
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen) el.msRequestFullscreen();
+        else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+      } catch (e) {}
     }
 
-    // Lê os dados APENAS da URL (nenhum dado pessoal fica no código)
     const params = new URLSearchParams(window.location.search);
 
     const matricula = params.get("m");
@@ -308,11 +204,9 @@
     const curso = params.get("c");
     const unidade = params.get("u");
 
-    // Se acessou SEM os parâmetros do QR Code → redireciona direto para o site oficial da UNIP
     if (!matricula || !nome || !nascimento || !curso) {
       window.location.replace("https://www.unip.br");
     } else {
-      // Dados vindos do QR → mostra a validação
       document.getElementById("matricula").textContent = matricula;
       document.getElementById("nome").textContent = nome;
       document.getElementById("nascimento").textContent = nascimento;
@@ -320,8 +214,10 @@
       document.getElementById("unidade").textContent = unidade || "—";
       document.getElementById("validadeTexto").textContent = getValidade();
 
-      // Contador de 60 segundos
-      let segundos = 60;
+      tentarTelaCheia();
+      setTimeout(tentarTelaCheia, 300);
+
+      let segundos = 30;
       const tempoEl = document.getElementById("tempo");
 
       const intervalo = setInterval(() => {
@@ -330,20 +226,10 @@
 
         if (segundos <= 0) {
           clearInterval(intervalo);
-
-          // Esconde os dados e mostra a tela de conclusão com logo UNIP
-          document.getElementById("conteudo").style.display = "none";
-          document.getElementById("header").style.display = "none";
-          document.getElementById("conclusao").classList.add("show");
-
-          // Após 4 segundos na tela de conclusão, redireciona para o site oficial
-          setTimeout(() => {
-            window.location.replace("https://www.unip.br");
-          }, 4000);
+          window.location.replace("https://www.unip.br");
         }
       }, 1000);
 
-      // Limpa um pouco o histórico
       if (window.history && window.history.replaceState) {
         window.history.replaceState(null, "", window.location.pathname);
       }
