@@ -175,9 +175,8 @@
 
   <div class="container" id="container">
     <div class="topo-unip">
-      <a href="#" onclick="sair(); return false;">
-        <div class="logo-unip">UNIP</div>
-        <div class="logo-sub">UNIVERSIDADE PAULISTA</div>
+      <a href="https://www.unip.br" onclick="sair(); return false;">
+        <img class="logo-unip" src="https://upload.wikimedia.org/wikipedia/commons/b/b4/Logo-unip.svg" alt="Logotipo UNIP"><div class="logo-sub">UNIVERSIDADE PAULISTA</div>
         <div class="atalho">www.unip.br</div>
       </a>
     </div>
@@ -276,12 +275,23 @@
         tentarTelaCheia();
         setTimeout(tentarTelaCheia, 300);
 
-        // Remove os dados da URL (não fica no histórico)
+        // Remove os dados do QR da barra de endereço e do item atual do histórico.
         if (window.history && window.history.replaceState) {
-          window.history.replaceState(null, "", window.location.pathname);
+          window.history.replaceState({ paginaValidacao: true }, "", window.location.pathname);
         }
 
-        // 15 segundos escondidos → sai sem possibilidade de voltar
+        // Se a página for restaurada pelo botão Voltar/Avançar (BFCache),
+        // redireciona imediatamente para o site oficial.
+        window.addEventListener("pageshow", function (event) {
+          if (event.persisted) sair();
+        });
+
+        // Detecta navegação de histórico dentro desta página.
+        window.addEventListener("popstate", function () {
+          sair();
+        });
+
+        // 15 segundos → sai para o site oficial.
         setTimeout(sair, 15000);
       }
     }
