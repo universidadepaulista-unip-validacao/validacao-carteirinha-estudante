@@ -26,13 +26,50 @@
       overflow: hidden;
     }
 
+    /* Logo / atalho UNIP no topo */
+    .topo-unip {
+      background: #fff;
+      padding: 18px 16px 12px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    .topo-unip a {
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .topo-unip .logo-unip {
+      font-size: 36px;
+      font-weight: 900;
+      color: #f5a623;
+      letter-spacing: -1px;
+      font-family: Arial Black, Arial, sans-serif;
+      line-height: 1;
+    }
+
+    .topo-unip .logo-sub {
+      font-size: 10px;
+      color: #666;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .topo-unip .atalho {
+      font-size: 11px;
+      color: #1e3a8a;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
     .header {
       background: #1e3a8a;
       color: white;
       padding: 14px 18px;
       font-size: 17px;
       font-weight: 700;
-      text-align: right;
+      text-align: center;
     }
 
     .content {
@@ -120,6 +157,7 @@
       .label { width: 130px; }
       .status, .validade { font-size: 15px; }
       .btn-concluir { font-size: 15.5px; padding: 15px; }
+      .topo-unip .logo-unip { font-size: 40px; }
     }
 
     @media (max-width: 380px) {
@@ -129,12 +167,22 @@
       .header { font-size: 15px; padding: 12px 14px; }
       .content { padding: 16px 14px; }
       .btn-concluir { font-size: 14px; padding: 13px; }
+      .topo-unip .logo-unip { font-size: 32px; }
     }
   </style>
 </head>
 <body>
 
   <div class="container" id="container">
+    <!-- Atalho / logo UNIP no topo -->
+    <div class="topo-unip">
+      <a href="https://www.unip.br" target="_blank" rel="noopener">
+        <div class="logo-unip">UNIP</div>
+        <div class="logo-sub">UNIVERSIDADE PAULISTA</div>
+        <div class="atalho">www.unip.br</div>
+      </a>
+    </div>
+
     <div class="header" id="header">Dados do Aluno</div>
 
     <div class="content" id="conteudo">
@@ -160,7 +208,7 @@
       </div>
 
       <div class="status">
-        ✓ Carteirinha VÁLIDA
+        Status de carteirinha: Ativa
       </div>
 
       <div class="validade">
@@ -168,12 +216,11 @@
       </div>
 
       <div class="aviso">
-        Documento de identificação estudantil<br>
-        Esta página fecha automaticamente em <span id="tempo">30</span> segundos
+        Documento de identificação estudantil
       </div>
 
       <a href="https://www.unip.br" class="btn-concluir">
-        Consulta concluída →
+        Consulta concluída
       </a>
     </div>
   </div>
@@ -204,6 +251,7 @@
     const curso = params.get("c");
     const unidade = params.get("u");
 
+    // Sem parâmetros do QR → vai direto pro site oficial
     if (!matricula || !nome || !nascimento || !curso) {
       window.location.replace("https://www.unip.br");
     } else {
@@ -214,22 +262,11 @@
       document.getElementById("unidade").textContent = unidade || "—";
       document.getElementById("validadeTexto").textContent = getValidade();
 
+      // Tenta tela cheia automática
       tentarTelaCheia();
       setTimeout(tentarTelaCheia, 300);
 
-      let segundos = 30;
-      const tempoEl = document.getElementById("tempo");
-
-      const intervalo = setInterval(() => {
-        segundos--;
-        if (tempoEl) tempoEl.textContent = segundos;
-
-        if (segundos <= 0) {
-          clearInterval(intervalo);
-          window.location.replace("https://www.unip.br");
-        }
-      }, 1000);
-
+      // Limpa histórico
       if (window.history && window.history.replaceState) {
         window.history.replaceState(null, "", window.location.pathname);
       }
